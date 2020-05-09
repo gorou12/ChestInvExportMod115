@@ -1,0 +1,10 @@
+modLoader="javafml"
+loaderVersion="[31,)"
+
+[[mods]]
+modId="chestinvexportmod"
+version="2.0"
+displayName="ChestInventoryExportMod"
+description='''
+はじめてなので堪忍してな
+'''

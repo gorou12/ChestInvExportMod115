@@ -1,0 +1,8 @@
+{
+  "chest_inv_export.start_recording": "[ChestInvExport] 記録を開始しました。",
+  "chest_inv_export.finish_recording": "[ChestInvExport] 記録を終了しました。",
+  "chest_inv_export.nothing_to_export": "[ChestInvExport] 書き出し対象のアイテムはありませんでした。",
+  "chest_inv_export.failure_saving": "[ChestInvExport] ファイルの書き出しに失敗しました。",
+  "chest_inv_export.successful_saving": "[ChestInvExport] ファイルの書き出しが完了しました。 %1$s",
+  "chest_inv_export.quit_recording": "[ChestInvExport] 記録を中止しました。"
+}

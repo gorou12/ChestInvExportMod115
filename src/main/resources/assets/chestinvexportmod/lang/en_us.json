@@ -1,0 +1,8 @@
+{
+  "chest_inv_export.start_recording": "[ChestInvExport] Recording Start.",
+  "chest_inv_export.finish_recording": "[ChestInvExport] Recording Finish.",
+  "chest_inv_export.nothing_to_export": "[ChestInvExport] Nothing to export.",
+  "chest_inv_export.failure_saving": "[ChestInvExport] Failed to write output file.",
+  "chest_inv_export.successful_saving": "[ChestInvExport] Succeed to write output file: %1$s.",
+  "chest_inv_export.quit_recording": "[ChestInvExport] Recording Quit."
+}
