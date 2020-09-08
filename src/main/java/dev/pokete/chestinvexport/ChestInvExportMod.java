@@ -1,9 +1,7 @@
 package dev.pokete.chestinvexport;
 
 import com.google.gson.Gson;
-import dev.pokete.chestinvexport.model.Book;
-import dev.pokete.chestinvexport.model.BooksData;
-import dev.pokete.chestinvexport.model.Enchantment;
+import dev.pokete.chestinvexport.model.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.resources.I18n;
@@ -42,7 +40,7 @@ public class ChestInvExportMod {
     @SubscribeEvent
     public void onItemFocus(ItemTooltipEvent e) {
         // RecordingModeじゃなければ抜ける
-        if(!recordingMode) return;
+        if (!recordingMode) return;
 
         ItemStack itemStack = e.getItemStack();
 
@@ -50,16 +48,16 @@ public class ChestInvExportMod {
         if (keepItemStack != null && keepItemStack.equals(itemStack)) return;
 
         keepItemStack = itemStack;
-        if(itemStack.getTag() == null || itemStack.getTag().get("StoredEnchantments") == null) return;
+        if (itemStack.getItem().getRegistryName() == null || itemStack.getTag() == null) return;
+        if (itemStack.getTag().get("StoredEnchantments") == null && !isEcoEgg(itemStack)) return;
         itemStackList.add(itemStack);
     }
 
     @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent e){
-        if(KeybindHandler.record_key.isKeyDown()){
+    public void onKeyInput(InputEvent.KeyInputEvent e) {
+        if (KeybindHandler.record_key.isKeyDown()) {
             onPressRecordKey();
-        }
-        else if (KeybindHandler.quit_key.isKeyDown()){
+        } else if (KeybindHandler.quit_key.isKeyDown()) {
             onPressQuitKey();
         }
     }
@@ -67,7 +65,7 @@ public class ChestInvExportMod {
     private void onPressQuitKey(){
         if(recordingMode){
             Minecraft mc = Minecraft.getInstance();
-            if(mc.player == null) return;
+            if (mc.player == null) return;
             ClientPlayerEntity me = mc.player;
 
             recordingMode = false;
@@ -75,12 +73,12 @@ public class ChestInvExportMod {
         }
     }
 
-    private void onPressRecordKey(){
+    private void onPressRecordKey() {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player == null) return;
+        if (mc.player == null) return;
         ClientPlayerEntity me = mc.player;
 
-        if(recordingMode){
+        if (recordingMode) {
             // on -> off
             recordingMode = false;
             finishRecording(me);
@@ -91,7 +89,7 @@ public class ChestInvExportMod {
         }
     }
 
-    private void startRecording(ClientPlayerEntity me){
+    private void startRecording(ClientPlayerEntity me) {
         itemStackList = new ArrayList<>();
         me.sendMessage(new StringTextComponent(I18n.format("chest_inv_export.start_recording")));
     }
@@ -106,23 +104,36 @@ public class ChestInvExportMod {
         List<Book> books = new ArrayList<>();
 
         for (ItemStack itemStack : itemStackList) {
-            if (itemStack.getTag() == null) continue;
+            if (itemStack.getItem().getRegistryName() == null || itemStack.getTag() == null) return;
 
             Book book = new Book();
-            List<Enchantment> enchantments = new ArrayList<>();
 
-            ListNBT listnbt = itemStack.getTag().getList("StoredEnchantments", Constants.NBT.TAG_COMPOUND);
-            for (INBT inbt : listnbt) {
-                if (!(inbt instanceof CompoundNBT)) continue;
-                Enchantment enchant = new Enchantment();
-                CompoundNBT cnbt = (CompoundNBT) inbt;
-                enchant.setEnchantment(cnbt.getString("id"));
-                enchant.setLevel((int) cnbt.getShort("lvl"));
-                enchantments.add(enchant);
+            switch (itemStack.getItem().getRegistryName().toString()) {
+                case "minecraft:enchanted_book":
+                    book.setItemType("enchanted_book");
+                    List<Enchantment> enchantments = new ArrayList<>();
+
+                    ListNBT listnbt = itemStack.getTag().getList("StoredEnchantments", Constants.NBT.TAG_COMPOUND);
+                    for (INBT inbt : listnbt) {
+                        if (!(inbt instanceof CompoundNBT)) continue;
+                        Enchantment enchant = new Enchantment();
+                        CompoundNBT cnbt = (CompoundNBT) inbt;
+                        enchant.setEnchantment(cnbt.getString("id"));
+                        enchant.setLevel((int) cnbt.getShort("lvl"));
+                        enchantments.add(enchant);
+                    }
+
+                    book.setRepairTimes(getRepairTimes(itemStack.getRepairCost()));
+                    book.setEnchantments(enchantments);
+
+                    break;
+                case "minecraft:written_book":
+                    book.setItemType("eco_egg");
+                    book.setCount(itemStack.getCount());
+                    break;
+                default:
+                    return;
             }
-
-            book.setRepairTimes(getRepairTimes(itemStack.getRepairCost()));
-            book.setEnchantments(enchantments);
 
             books.add(book);
         }
@@ -143,5 +154,13 @@ public class ChestInvExportMod {
             me.sendMessage(new StringTextComponent(I18n.format("chest_inv_export.failure_saving")));
         }
         me.sendMessage(new StringTextComponent(I18n.format("chest_inv_export.successful_saving", file.getAbsolutePath())));
+    }
+
+    private boolean isEcoEgg(ItemStack itemStack) {
+        return (itemStack.getItem().getRegistryName() != null)
+        && ("minecraft:written_book".equals(itemStack.getItem().getRegistryName().toString()))
+        && (itemStack.getTag() != null)
+        && ("魔道書「えこたまご」".equals(itemStack.getTag().getString("title")))
+        && ("神官えこ".equals(itemStack.getTag().getString("author")));
     }
 }

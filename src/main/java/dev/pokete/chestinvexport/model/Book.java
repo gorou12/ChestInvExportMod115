@@ -7,12 +7,26 @@ import com.google.gson.annotations.SerializedName;
 
 public class Book {
 
+    @SerializedName("item_type")
+    @Expose
+    private String itemType;
     @SerializedName("repair_times")
     @Expose
     private Integer repairTimes;
     @SerializedName("enchantments")
     @Expose
     private List<Enchantment> enchantments = null;
+    @SerializedName("count")
+    @Expose
+    private Integer count;
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
 
     public Integer getRepairTimes() {
         return repairTimes;
@@ -28,6 +42,14 @@ public class Book {
 
     public void setEnchantments(List<Enchantment> enchantments) {
         this.enchantments = enchantments;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 
 }

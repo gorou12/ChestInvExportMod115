@@ -10,7 +10,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.2.3'
+version = '2.1'
 group = 'dev.pokete.chestinvexport'
 archivesBaseName = 'ChestInvExportMod'
 
